@@ -1,0 +1,43 @@
+{
+  "preset_name": "빠르고 정확한",
+  "preset_description": "숙련된 타이피스트. burst ON, 오타 적음.",
+  "timing": {
+    "base_delay_ms": 45,
+    "delay_variance_ms": 15,
+    "word_boundary_enabled": true,
+    "intra_word_speed_factor": 0.7,
+    "inter_word_pause_ms": 80,
+    "punctuation_pause_enabled": true,
+    "punctuation_pause_ms": 120,
+    "newline_pause_enabled": true,
+    "newline_pause_ms": 250,
+    "shift_penalty_enabled": true,
+    "shift_penalty_ms": 15,
+    "double_letter_enabled": true,
+    "double_letter_speed_factor": 0.5,
+    "burst_enabled": true,
+    "burst_pause_ms": 30,
+    "fatigue_enabled": true,
+    "fatigue_factor": 0.03
+  },
+  "typo": {
+    "typo_prob": 10,
+    "typo_revision_prob": 95,
+    "adjacent_key_enabled": true,
+    "transposition_enabled": false,
+    "double_strike_enabled": false
+  },
+  "control": {
+    "precise_mode": false,
+    "countdown_seconds": 3,
+    "focus_monitor_enabled": true
+  },
+  "preprocessing": {
+    "crlf_normalize": true,
+    "trim": true,
+    "normalize_spaces": false,
+    "newline_mode": "enter",
+    "max_length_enabled": false,
+    "max_length": 10000
+  }
+}

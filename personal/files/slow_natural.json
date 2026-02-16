@@ -1,0 +1,43 @@
+{
+  "preset_name": "느리고 자연스러운",
+  "preset_description": "천천히 정확하게. 모든 타이밍 옵션 ON.",
+  "timing": {
+    "base_delay_ms": 120,
+    "delay_variance_ms": 50,
+    "word_boundary_enabled": true,
+    "intra_word_speed_factor": 0.85,
+    "inter_word_pause_ms": 200,
+    "punctuation_pause_enabled": true,
+    "punctuation_pause_ms": 350,
+    "newline_pause_enabled": true,
+    "newline_pause_ms": 700,
+    "shift_penalty_enabled": true,
+    "shift_penalty_ms": 40,
+    "double_letter_enabled": true,
+    "double_letter_speed_factor": 0.7,
+    "burst_enabled": false,
+    "burst_pause_ms": 40,
+    "fatigue_enabled": true,
+    "fatigue_factor": 0.08
+  },
+  "typo": {
+    "typo_prob": 15,
+    "typo_revision_prob": 90,
+    "adjacent_key_enabled": true,
+    "transposition_enabled": false,
+    "double_strike_enabled": false
+  },
+  "control": {
+    "precise_mode": false,
+    "countdown_seconds": 5,
+    "focus_monitor_enabled": true
+  },
+  "preprocessing": {
+    "crlf_normalize": true,
+    "trim": true,
+    "normalize_spaces": false,
+    "newline_mode": "enter",
+    "max_length_enabled": false,
+    "max_length": 10000
+  }
+}

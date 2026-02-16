@@ -1,0 +1,3 @@
+{
+    "python.defaultInterpreterPath": "${env:USERPROFILE}\\micromamba\\envs\\human-typer\\python.exe"
+}

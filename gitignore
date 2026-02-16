@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.vscode/
+config.json
+presets/custom/*.json
+*.egg-info/
+dist/
+build/
+.env
+personal/
