@@ -8,4 +8,4 @@ presets/custom/*.json
 dist/
 build/
 .env
-personal/
+personal
