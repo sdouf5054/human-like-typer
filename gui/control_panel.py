@@ -37,11 +37,14 @@ class ControlPanel(ctk.CTkFrame):
     """컨트롤 패널."""
 
     def __init__(self, master, get_target_text: Callable[[], str],
-                 get_settings: Callable[[], tuple] | None = None, **kwargs):
+                 get_settings: Callable[[], tuple] | None = None,
+                 on_auto_clip_start: Callable[[], str] | None = None,
+                 **kwargs):
         super().__init__(master, **kwargs)
 
         self._get_target_text = get_target_text
         self._get_settings = get_settings
+        self._on_auto_clip_start = on_auto_clip_start
         self._app = master
 
         self._engine: TyperEngine | None = None
@@ -90,6 +93,10 @@ class ControlPanel(ctk.CTkFrame):
 
         self._focus_var = ctk.BooleanVar(value=True)
         ctk.CTkCheckBox(row1, text="🔍 포커스 감시", variable=self._focus_var,
+                          font=ctk.CTkFont(size=11)).pack(side="right", padx=(8, 0))
+
+        self._auto_clip_var = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(row1, text="📋 자동 클립보드", variable=self._auto_clip_var,
                           font=ctk.CTkFont(size=11)).pack(side="right", padx=(8, 0))
 
         # ── Row 2: 버튼 ──
@@ -195,6 +202,12 @@ class ControlPanel(ctk.CTkFrame):
     def set_focus_monitor(self, val: bool):
         self._focus_var.set(val)
 
+    def get_auto_clipboard(self) -> bool:
+        return self._auto_clip_var.get()
+
+    def set_auto_clipboard(self, val: bool):
+        self._auto_clip_var.set(val)
+
     # ── 핫키 ──
 
     def _on_trigger_change(self, v):
@@ -240,12 +253,26 @@ class ControlPanel(ctk.CTkFrame):
             return r[0], r[1], r[2], focus
         return TimingConfig(), TypoConfig(), False, focus
 
+    # ── 자동 클립보드 헬퍼 ──
+
+    def _resolve_target_text(self) -> str:
+        """
+        대상 텍스트를 결정.
+        자동 클립보드가 ON이면 콜백을 통해 클립보드에서 즉시 읽어서 반환.
+        OFF이면 기존 방식 (미리 설정된 _target_text).
+        """
+        if self._auto_clip_var.get() and self._on_auto_clip_start:
+            text = self._on_auto_clip_start()
+            if text:
+                return text
+        return self._get_target_text()
+
     # ── 버튼 핸들러 ──
 
     def _on_start(self, dry_run=False):
-        text = self._get_target_text()
+        text = self._resolve_target_text()
         if not text:
-            self._log("[경고] 대상 텍스트 없음. '이 텍스트 사용'을 먼저 클릭하세요.")
+            self._log("[경고] 대상 텍스트 없음. '이 텍스트 사용'을 먼저 클릭하거나 '자동 클립보드'를 활성화하세요.")
             return
 
         timing_cfg, typo_cfg, precise, focus_en = self._read_settings()
@@ -273,7 +300,8 @@ class ControlPanel(ctk.CTkFrame):
         self._progress_label.configure(text="0%")
 
         mode = "드라이런" if dry_run else "실제 타이핑"
-        self._log(f"[시작] {mode} — {len(text)}자 "
+        src = "(자동 클립보드)" if self._auto_clip_var.get() else ""
+        self._log(f"[시작] {mode} {src} — {len(text)}자 "
                   f"(딜레이:{timing_cfg.base_delay_ms}ms 오타:{typo_cfg.typo_prob/100:.2f}%)")
         self._engine.start(text)
 

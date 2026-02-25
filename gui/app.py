@@ -13,6 +13,7 @@ import customtkinter as ctk
 from gui.input_panel import InputPanel
 from gui.settings_panel import SettingsWindow
 from gui.control_panel import ControlPanel
+from core.clipboard import get_clipboard_text
 from core.text_preprocessor import preprocess, PreprocessConfig
 from core.timing_model import TimingConfig
 from core.typo_model import TypoConfig
@@ -97,8 +98,32 @@ class App(ctk.CTk):
             self,
             get_target_text=lambda: self._target_text,
             get_settings=self._get_current_settings,
+            on_auto_clip_start=self._auto_clipboard_read,
         )
         self._control_panel.pack(fill="both", padx=8, pady=(3, 6), expand=True)
+
+    # ── 자동 클립보드 콜백 ──
+
+    def _auto_clipboard_read(self) -> str:
+        """
+        자동 클립보드 모드: 클립보드를 읽고 전처리 후 대상 텍스트로 설정.
+        ControlPanel에서 트리거 시 호출됨.
+        반환값이 타이핑 대상 텍스트.
+        """
+        raw = get_clipboard_text()
+        if not raw:
+            return ""
+        prep_cfg = self._settings_win.get_preprocess_config() if self._settings_win else PreprocessConfig()
+        text = preprocess(raw, prep_cfg)
+        if text:
+            self._target_text = text
+            preview = text[:50].replace('\n', '↵')
+            sfx = "..." if len(text) > 50 else ""
+            self._target_label.configure(
+                text=f"대상: \"{preview}{sfx}\" ({len(text)}자) [자동 클립보드]",
+                text_color=("gray10", "gray90"),
+            )
+        return text
 
     # ── 설정 창 ──
 
