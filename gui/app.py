@@ -183,6 +183,14 @@ class App(ctk.CTk):
         focus = control.get("focus_monitor_enabled", True)
         self._control_panel.set_focus_monitor(focus)
 
+        # 트리거 키 복원
+        trigger = control.get("trigger_key", "F6")
+        self._control_panel.set_trigger_key(trigger)
+
+        # 자동 클립보드 복원
+        auto_clip = control.get("auto_clipboard", False)
+        self._control_panel.set_auto_clipboard(auto_clip)
+
     def _on_save_custom(self):
         dialog = ctk.CTkInputDialog(text="커스텀 프리셋 이름:", title="프리셋 저장")
         name = dialog.get_input()
@@ -195,6 +203,8 @@ class App(ctk.CTk):
             "precise_mode": precise,
             "countdown_seconds": self._control_panel.get_countdown(),
             "focus_monitor_enabled": self._control_panel.get_focus_monitor(),
+            "trigger_key": self._control_panel.get_trigger_key(),
+            "auto_clipboard": self._control_panel.get_auto_clipboard(),
         }
         prep = self._settings_win.get_preprocess_config()
         data = configs_to_preset(name.strip(), "사용자 커스텀", timing, typo, control, prep)

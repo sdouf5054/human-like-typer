@@ -208,6 +208,16 @@ class ControlPanel(ctk.CTkFrame):
     def set_auto_clipboard(self, val: bool):
         self._auto_clip_var.set(val)
 
+    def get_trigger_key(self) -> str:
+        return self._trigger_key_name
+
+    def set_trigger_key(self, key_name: str):
+        """트리거 키 설정. 예: 'F6', 'F1' 등."""
+        if key_name in FKEY_MAP:
+            self._trigger_key_name = key_name
+            self._trigger_key = FKEY_MAP[key_name]
+            self._trigger_dd.set(key_name)
+
     # ── 핫키 ──
 
     def _on_trigger_change(self, v):
@@ -380,7 +390,6 @@ class ControlPanel(ctk.CTkFrame):
                   f"(수정 {ts.get('revised',0)} / 미수정 {ts.get('unrevised',0)})")
         self._log(f"{'='*40}")
 
-        # 통계 데이터 저장 (📊 버튼으로 열기 위해)
         self._last_stats = stats
         self._last_timing_data = self._engine.timing_data if self._engine else []
         self._btn_stats.configure(state="normal")
