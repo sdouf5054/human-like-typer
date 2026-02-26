@@ -1,49 +1,98 @@
 # Human-Like Typer v1.0
 
-클립보드 또는 직접 입력한 텍스트를 **사람처럼 자연스럽게** 자동 타이핑하는 Windows 유틸리티.
+A Windows utility that automatically types text from your clipboard or manual input with human-like timing, typos, and corrections.
 
-## 주요 기능
+## Features
 
-- **8단계 타이밍 파이프라인**: 기본 딜레이, 분산, 단어 경계, 구두점, 개행, Shift 패널티, 동일 글자 가속, 피로 시뮬레이션
-- **3종 오타 시스템**: 인접 키/글자 전치/이중 입력 + 자동 수정 시퀀스
-- **포커스 모니터**: 타이핑 중 다른 창으로 전환되면 자동 일시정지
-- **프리셋 시스템**: 기본 4종 + 커스텀 저장/불러오기
-- **내장 테스트**: 외부 앱 없이 프로그램 안에서 타이핑 동작 미리 확인
-- **핫키 제어**: F6(시작/일시정지/재개), ESC(긴급 정지)
+**8-Stage Timing Pipeline**
+Base delay with Gaussian variance, word boundary pauses, punctuation pauses, newline pauses, Shift key penalty, double-letter acceleration, burst typing micro-pauses, and fatigue simulation that gradually slows typing over long texts.
 
-## 설치
+**3 Typo Types + Auto-Correction**
+Adjacent key errors (QWERTY-based), character transposition, and double-strike mistakes. Each typo can trigger a realistic correction sequence: recognition pause, burst backspace, retype delay, and re-entry of the correct character.
+
+**Focus Monitor**
+Captures the active window title at typing start. Automatically pauses if focus shifts to another window and resumes when you return.
+
+**Preset System**
+4 built-in presets (Default, Fast & Accurate, Slow & Natural, Sloppy Beginner) plus custom preset save/load. Presets store all settings including timing, typo, trigger key, auto-clipboard, countdown, and preprocessing options. The last-used preset is remembered across sessions via `config.json`.
+
+**Auto-Clipboard Mode**
+When enabled, pressing the trigger key reads the current clipboard content and starts typing immediately -- no need to click "Use this text" first.
+
+**Built-in Test Panel**
+Preview typing behavior inside the app without sending keystrokes to external applications. Runs the full timing and typo pipeline against sample texts in a side-by-side view (original vs. typed output).
+
+**Statistics and Visualization**
+After each run, view CPM/WPM, delay distribution histogram, per-character delay scatter plot, and typo breakdown. Requires matplotlib.
+
+**Hotkey Control**
+Configurable trigger key (F1-F12, default F9) for start/pause/resume. ESC for immediate hard stop.
+
+## Requirements
+
+- Python 3.11+
+- Windows 10/11 (focus monitor uses Win32 API; disabled on other platforms)
+- English input mode recommended (Korean IME should be off unless typing Korean)
+
+## Installation
 
 ```bash
-# micromamba/conda 환경 생성
+# Create environment (micromamba or conda)
 micromamba create -n human-like-typer python=3.11 -y
 micromamba activate human-like-typer
 
-# 패키지 설치
+# Install dependencies
 pip install customtkinter pynput pyperclip matplotlib
 ```
 
-## 실행
+## Usage
 
 ```bash
-cd human-like-typer
 python main.py
 ```
 
-## 사용법
+Or use the included `run.bat` which activates the environment automatically.
 
-1. **입력**: 클립보드 탭에서 새로고침 또는 직접 입력 탭에 텍스트 작성 → "▶ 이 텍스트 사용"
-2. **프리셋**: 상단 드롭다운에서 선택 (기본/빠르고 정확한/느리고 자연스러운/오타 많은 초보)
-3. **설정**: "⚙ 설정" 버튼 → 별도 창에서 타이밍/오타/고급 옵션 조정
-4. **실행**: ▶ 시작 또는 F6 → 카운트다운 후 대상 앱에서 타이핑 시작
-5. **테스트**: "🧪 테스트" 버튼 → 앱 내부에서 미리 확인 (외부 앱 불필요)
-6. **통계**: 실행 완료 후 "📊 통계" 버튼으로 딜레이 분포 차트 확인
+**Basic workflow:**
 
-## 요구 사항
+1. Select a preset from the top dropdown, or adjust settings via the Settings button.
+2. Paste or type your text in the Input Source panel, then click "Use this text". Alternatively, enable Auto-Clipboard mode to skip this step.
+3. Switch to your target application (e.g. a text editor or browser input field).
+4. Press the trigger key (default F9). After the countdown, typing begins.
+5. Press the trigger key again to pause/resume. Press ESC to stop immediately.
+6. After completion, click the Stats button to view timing charts and typo statistics.
 
-- Python 3.11+
-- Windows 10/11 (포커스 모니터는 Windows 전용, 타 OS에서는 비활성)
-- 영문 입력 모드 (한글 IME 비활성화 상태에서 사용)
+## Project Structure
 
-## 라이선스
+```
+human-like-typer/
+  main.py                  Entry point
+  preset_manager.py        Preset load/save + config.json management
+  run.bat                  Quick launcher (micromamba)
+  config.json              Auto-generated session config (gitignored)
+  core/
+    clipboard.py           Clipboard reader (pyperclip)
+    focus_monitor.py       Active window focus tracking (Win32)
+    keyboard_map.py        QWERTY adjacent key map + Shift mappings
+    text_preprocessor.py   CRLF normalization, trimming, newline handling
+    timing_model.py        8-stage per-character delay calculator
+    typo_model.py          Typo generation + correction action sequences
+    typer_engine.py        Main engine: state machine + threading + key simulation
+  gui/
+    app.py                 Main window, preset/settings integration
+    input_panel.py         Clipboard preview + direct text input tabs
+    control_panel.py       Start/pause/stop, hotkeys, progress, log
+    settings_panel.py      Timing/typo/advanced settings (separate window)
+    stats_dialog.py        Post-run statistics + matplotlib charts
+    test_panel.py          Built-in typing simulation preview
+  presets/
+    default.json           Balanced defaults
+    fast_accurate.json     Fast typist, low error rate, burst ON
+    slow_natural.json      Slow and careful, all timing options ON
+    sloppy_beginner.json   Slow with high typo rate and strong fatigue
+    custom/                User-saved presets (gitignored)
+```
+
+## License
 
 MIT
