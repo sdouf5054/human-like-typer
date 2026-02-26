@@ -30,7 +30,9 @@
   "control": {
     "precise_mode": false,
     "countdown_seconds": 3,
-    "focus_monitor_enabled": true
+    "focus_monitor_enabled": true,
+    "trigger_key": "F9",
+    "auto_clipboard": true
   },
   "preprocessing": {
     "crlf_normalize": true,
